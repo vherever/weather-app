@@ -15,7 +15,7 @@ export class CitiesApiService {
     return this.httpService.get(`https://api.teleport.org/api/cities/geonameid:${2988507}`);
   }
 
-  getCityDetailsByUrl(value: string): Observable<CityModelByGeoNameId> {
-    return this.httpService.get(value);
+  proceedGenericCallWithGET<T>(url: string): Observable<T> {
+    return this.httpService.get(url);
   }
 }

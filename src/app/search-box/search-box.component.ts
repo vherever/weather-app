@@ -28,11 +28,9 @@ export class SearchBoxComponent implements OnInit {
   }
 
   public onOptionSelected(option: CitySearchResult): void {
-    console.log('d', option._links['city:item'].href);
-
-    this.citiesService.getCityDetailsByUrl(option._links['city:item'].href).subscribe((res) => {
+    this.citiesService.proceedGenericCallWithGET<CityModelByGeoNameId>(option._links['city:item'].href).subscribe((res) => {
       this.selectedCityEventEmitter.next(res);
-    })
+    });
   }
 
   displayFn(option: CitySearchResult): string {

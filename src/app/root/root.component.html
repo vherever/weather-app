@@ -23,6 +23,11 @@
             </ng-container>
         </div>
 
+        <ng-container *ngIf="cityImageUrl$ | async as cityImageUrl">
+            <em>cityImageUrl: {{ cityImageUrl | json }}</em>
+            <img src="" alt="" />
+        </ng-container>
+
 <!--        <div class="weather_container__city_highlight_container">city image</div>-->
     </div>
     <div class="weather_container__right">

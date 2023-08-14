@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { map, Observable, of, shareReplay, switchMap, tap, timer } from 'rxjs';
+import { BehaviorSubject, map, Observable, shareReplay, switchMap, tap, timer } from 'rxjs';
 import { CityModelByGeoNameId } from '../models/city.model';
 import { WeatherModel } from '../models/weather.model';
-import { GeoService } from '../services/geo.service';
 import { CitiesApiService } from '../services/cities-api.service';
+import { GeoService } from '../services/geo.service';
 import { WeatherApiService } from '../services/weather-api.service';
 import * as dayjs from 'dayjs';
 
@@ -16,8 +16,12 @@ function getCardinalDirection(angle: number): string {
 
 // TODO: check if ts in milliseconds
 function getTimeHhMmFromTimestamp(ts: number): string {
+  const leadingZero = (num: number) => `0${num}`.slice(-2);
   const dateObj = dayjs(ts * 1000);
-  return `${dateObj.hour()}:${dateObj.minute()}`;
+
+  return [dateObj.hour(), dateObj.minute()]
+    .map(leadingZero)
+    .join(':');
 }
 
 function formatMetersToKms(value: number): number {
@@ -64,12 +68,70 @@ function getUvIndexPercentage(value: number): number {
 export class RootComponent {
   public readonly weatherIconRepositoryUrl = 'https://openweathermap.org/img/wn/';
 
-  public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1));
+  public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1)).pipe(
+    tap((data) => {
+      console.log('lll', data);
+    })
+  );
+
+  public cityImageUrl$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   public weatherData$ = this.locationData$.pipe(
     switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] })),
     map((res) => ({
       ...res,
+      ...this.transformWeatherData(res)
+    })),
+    tap((res) => {
+      console.log('R', res);
+    })
+  );
+
+  public dateFormatted$ = timer(0, 1000).pipe(
+    map(() => getDateFormatted())
+  )
+
+  constructor(
+    private geoService: GeoService,
+    private weatherService: WeatherApiService,
+    private citiesApiService: CitiesApiService
+  ) {}
+
+  public onSelectedCityEventEmit(value: CityModelByGeoNameId): void {
+    console.log('v', `${value._links['city:urban_area']?.href}images`); // photos[0].image.mobile
+
+    /**
+     * const obs$ = value._links['city:urban_area'] ? this.citiesApiService.proceedGenericCallWithGET<any>(`${value._links['city:urban_area']?.href}images`) : EMPTY;
+     *     this.locationData$ = obs$.pipe(
+     *       switchMap(() => this.locationData$),
+     *       map((data) => ({
+     *         ...data,
+     *         city: value.name,
+     *         city_image_url: `${value._links['city:urban_area']?.href}images`
+     *       }))
+     *     );
+     */
+
+    this.locationData$ = this.locationData$.pipe(
+      map((data) => ({
+        ...data,
+        city: value.name,
+        city_image_url: `${value._links['city:urban_area']?.href}images`
+      }))
+    )
+    const latLon = value.location.latlon;
+    this.weatherData$ = this.weatherService.getWeatherByLonAndLat({ lon: latLon.longitude, lat: latLon.latitude }).pipe(
+      map((res) => ({
+        ...res,
+        ...this.transformWeatherData(res)
+      }))
+    );
+
+    // this.cityImageUrl$.next(`${value._links['city:urban_area']?.href}images`);
+  }
+
+  private transformWeatherData(res: WeatherModel): any {
+    return {
       current: {
         ...res.current,
         __wind_direction: getCardinalDirection(res.current.wind_deg),
@@ -96,23 +158,6 @@ export class RootComponent {
           night: o.temp.night.toFixed(0),
         }
       }))
-    })),
-    tap((res) => {
-      console.log('R', res);
-    })
-  );
-
-  public dateFormatted$ = timer(0, 1000).pipe(
-    map(() => getDateFormatted())
-  )
-
-  public onSelectedCityEventEmit(value: CityModelByGeoNameId): void {
-    console.log('va', value.location.latlon);
+    }
   }
-
-  constructor(
-    private geoService: GeoService,
-    private weatherService: WeatherApiService,
-    private citiesApiService: CitiesApiService
-  ) {}
 }
