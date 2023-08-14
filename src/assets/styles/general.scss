@@ -1,0 +1,14 @@
+/**
+Custom general components styling
+ */
+
+.application-card {
+  position: relative;
+  padding: 15px 15px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  &__header {
+    font-size: 13px;
+    color: #aeaeae;
+  }
+}
