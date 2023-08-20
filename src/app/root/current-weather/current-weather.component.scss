@@ -68,6 +68,12 @@
   }
 }
 
+.weather-property-container {
+  display: flex;
+  place-content: center flex-start;
+  align-items: center;
+}
+
 .extra-card-wrapper {
   display: flex;
   place-content: flex-start space-between;

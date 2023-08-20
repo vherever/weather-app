@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { weatherIconRepositoryUrl } from 'src/app/app-constants';
 import { CurrentWeatherModel, DailyWeatherModel } from '../../models/weather.model';
 
 @Component({
@@ -14,6 +15,8 @@ export class CurrentWeatherComponent {
   @Input() set currentWeatherData(data: CurrentWeatherModel | DailyWeatherModel) {
     this.weatherData = data;
   }
+
+  public readonly weatherIconRepositoryUrl = weatherIconRepositoryUrl;
 
   public weatherData: CurrentWeatherModel | DailyWeatherModel;
 

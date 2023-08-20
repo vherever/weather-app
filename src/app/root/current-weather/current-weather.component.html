@@ -70,6 +70,10 @@
         </div>
 
         <div class="application-card" *ngIf="!weatherData.__visibility" style="width: 100%">
+            <div *ngFor="let item of weatherData.weather" style="text-transform: capitalize" class="weather-property-container">
+                <div>{{ item.description }}</div>
+                <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="32">
+            </div>
             <div class="extra-card-wrapper">
                 <table width="100%">
                     <tr>

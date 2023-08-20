@@ -132,6 +132,7 @@ export class RootComponent {
       map((data) => ({
         ...data,
         city: value.name,
+        full_name: value.full_name,
         city_image_url: `${value._links['city:urban_area']?.href}images`
       }))
     )

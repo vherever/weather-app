@@ -4,4 +4,5 @@ export interface GeoModel {
   country_name: string;
   loc: number[]; // [lon, lat]
   city_image_url?: string;
+  full_name?: string;
 }

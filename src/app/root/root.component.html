@@ -4,8 +4,11 @@
 
         <div class="weather_container__left__location_container" *ngIf="locationData$ | async as locationData">
             <div class="weather_container__left__location_container__city ta-center w-100">
-                <span>{{ locationData?.city }}</span>,
-                <span>{{ locationData?.country }}</span>
+                <ng-container *ngIf="!locationData.full_name">
+                    <span>{{ locationData?.city }}</span>,
+                    <span>{{ locationData?.country }}</span>
+                </ng-container>
+                <span *ngIf="locationData.full_name">{{ locationData.full_name }}</span>
             </div>
             <div class="weather_container__left__location_container__country">{{ locationData?.country_name }}</div>
         </div>
@@ -19,13 +22,11 @@
 
         <div class="weather_container__description_container">
             <ng-container *ngFor="let item of weatherData.current.weather">
-                <div>{{ item.description }}</div>
+                <div style="text-transform: capitalize;">{{ item.description }}</div>
 
                 <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="32">
             </ng-container>
         </div>
-
-<!--        <div class="weather_container__city_highlight_container">city image</div>-->
     </div>
     <div class="weather_container__right">
         <div class="weather_container__right__inner">
@@ -39,7 +40,6 @@
                 </div>
             </div>
 
-            <br>
             <app-this-week [weeklyData]="weatherData.daily" (activeItemEventEmitter)="onActiveItemEventEmit($event)"></app-this-week>
         </div>
     </div>
