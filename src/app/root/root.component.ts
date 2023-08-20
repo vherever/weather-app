@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { map, shareReplay, switchMap, tap, timer } from 'rxjs';
 import { weatherIconRepositoryUrl } from '../app-constants';
 import { CityModelByGeoNameId } from '../models/city.model';
@@ -98,15 +99,17 @@ export class RootComponent {
 
   public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1));
 
-  public weatherData$ = this.locationData$.pipe(
-    switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] })),
-    map((res) => ({
-      ...res,
-      ...this.transformWeatherData(res)
-    })),
-    tap((data) => {
-      data.daily[this.activeDayNo].__isActive = true;
-    })
+  public weatherData$ = this.route.queryParams.pipe(
+    switchMap((queryParams) => this.locationData$.pipe(
+      switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] }, queryParams['apikey'])),
+      map((res) => ({
+        ...res,
+        ...this.transformWeatherData(res)
+      })),
+      tap((data) => {
+        data.daily[this.activeDayNo].__isActive = true;
+      })
+    ))
   );
 
   public dateFormatted$ = timer(0, 1000).pipe(
@@ -115,7 +118,8 @@ export class RootComponent {
 
   constructor(
     private geoService: GeoService,
-    private weatherService: WeatherApiService
+    private weatherService: WeatherApiService,
+    private route: ActivatedRoute
   ) {}
 
   public onActiveItemEventEmit(data: { item: DailyWeatherModel; index: number }): void {
@@ -124,20 +128,6 @@ export class RootComponent {
   }
 
   public onSelectedCityEventEmit(value: CityModelByGeoNameId): void {
-    console.log('v', `${value._links['city:urban_area']?.href}images`); // photos[0].image.mobile
-
-    /**
-     * const obs$ = value._links['city:urban_area'] ? this.citiesApiService.proceedGenericCallWithGET<any>(`${value._links['city:urban_area']?.href}images`) : EMPTY;
-     *     this.locationData$ = obs$.pipe(
-     *       switchMap(() => this.locationData$),
-     *       map((data) => ({
-     *         ...data,
-     *         city: value.name,
-     *         city_image_url: `${value._links['city:urban_area']?.href}images`
-     *       }))
-     *     );
-     */
-
     this.locationData$ = this.locationData$.pipe(
       map((data) => ({
         ...data,
@@ -146,11 +136,15 @@ export class RootComponent {
       }))
     )
     const latLon = value.location.latlon;
-    this.weatherData$ = this.weatherService.getWeatherByLonAndLat({ lon: latLon.longitude, lat: latLon.latitude }).pipe(
+    this.weatherData$ = this.route.queryParams.pipe(
+      switchMap((queryParams) => this.weatherService.getWeatherByLonAndLat({ lon: latLon.longitude, lat: latLon.latitude }, queryParams['apikey'])),
       map((res) => ({
         ...res,
         ...this.transformWeatherData(res)
-      }))
+      })),
+      tap((data) => {
+        data.daily[this.activeDayNo].__isActive = true;
+      })
     );
   }
 

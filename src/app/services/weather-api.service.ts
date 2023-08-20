@@ -188,8 +188,8 @@ export class WeatherApiService {
   constructor(private http: HttpService) {
   }
 
-  getWeatherByLonAndLat(reqData: { lon: number; lat: number }): Observable<WeatherModel> {
-    return this.http.get(`${environment.API.WEATHER.URL}&lon=${reqData.lon}&lat=${reqData.lat}&exclude=hourly`);
+  getWeatherByLonAndLat(reqData: { lon: number; lat: number }, apiKey: string): Observable<WeatherModel> {
+    return this.http.get(`${environment.API.WEATHER.URL}&lon=${reqData.lon}&lat=${reqData.lat}&exclude=hourly&appId=${apiKey}`);
     // return of(ONE_CALL_DATA);
   }
 
