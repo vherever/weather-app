@@ -1,0 +1,106 @@
+<div>
+    <h3>{{ componentTitle }}</h3>
+    <div class="weather_container__palette">
+        <div class="application-card uvi-index-container">
+            <div class="application-card__header">UV Index</div>
+            <div class="uvi-index-container__color_range">
+                <div class="uvi-index-container__color_range__from"></div>
+                <div class="uvi-index-container__color_range__current"
+                     [ngStyle]="{'left': 'calc(' +weatherData.__uvi_percentage + '% - 4px)'}">{{ weatherData.uvi }}</div>
+                <div class="uvi-index-container__color_range__to"></div>
+            </div>
+            <br>
+            <div class="ta-center">{{ weatherData.__uvi_status }}</div>
+        </div>
+
+        <div class="application-card wind-container">
+            <div class="application-card__header">Wind</div>
+            <div class="wind-container__value_container">
+                <div style="margin: 0 auto">
+                    <span class="application-card__value">{{ weatherData.wind_speed }}</span>
+                    <span class="application-card__operator">m/s</span>
+                </div>
+            </div>
+
+            <div class="ta-center" style="margin-top: 7px">{{ weatherData.__wind_direction }}</div>
+        </div>
+
+        <div class="application-card">
+            <div class="application-card__header">Sunrise & Sunset</div>
+            <div class="ta-center">
+                <img src="../../assets/images/sunrise.svg" alt="Sunrise" width="32">
+                {{ weatherData.__sunrise }}
+            </div>
+            <div class="ta-center">
+                <img src="../../assets/images/sunset.svg" alt="Sunset" width="32">
+                {{ weatherData.__sunset }}
+            </div>
+        </div>
+
+        <div class="application-card">
+            <div class="application-card__header">Clouds</div>
+            <div class="ta-center">
+                <span class="application-card__value">{{ weatherData.clouds }}</span>
+                <span class="application-card__operator">%</span>
+            </div>
+        </div>
+
+        <div class="application-card">
+            <div class="application-card__header">Humidity</div>
+            <div class="ta-center">
+                <span class="application-card__value">{{ weatherData.humidity }}</span>
+                <span class="application-card__operator">%</span>
+            </div>
+        </div>
+
+        <div class="application-card">
+            <div class="application-card__header">Pressure</div>
+            <div class="ta-center">
+                <span class="application-card__value">{{ weatherData.pressure }}</span>
+                <span class="application-card__operator">hPa</span>
+            </div>
+        </div>
+
+        <div class="application-card" *ngIf="weatherData.__visibility">
+            <div class="application-card__header">Visibility</div>
+            <div class="ta-center">
+                <span class="application-card__value">{{ weatherData.__visibility }}</span>
+                <span class="application-card__operator">km</span>
+            </div>
+        </div>
+
+        <div class="application-card" *ngIf="!weatherData.__visibility" style="width: 100%">
+            <div class="extra-card-wrapper">
+                <table width="100%">
+                    <tr>
+                        <td width="25%">Morning</td>
+                        <td width="25%">{{ weatherData.__feels_like && weatherData.__feels_like['morn'] }}℃</td>
+                        <td width="25%">Feels like</td>
+                        <td width="25%">{{ weatherData.__temp && weatherData.__temp['morn'] }}℃</td>
+                    </tr>
+
+                    <tr>
+                        <td>Day</td>
+                        <td>{{ weatherData.__feels_like && weatherData.__feels_like['day'] }}℃</td>
+                        <td>Feels like</td>
+                        <td>{{ weatherData.__temp && weatherData.__temp['day'] }}℃</td>
+                    </tr>
+
+                    <tr>
+                        <td>Evening</td>
+                        <td>{{ weatherData.__feels_like && weatherData.__feels_like['eve'] }}℃</td>
+                        <td>Feels like</td>
+                        <td>{{ weatherData.__temp && weatherData.__temp['eve'] }}℃</td>
+                    </tr>
+
+                    <tr>
+                        <td>Night</td>
+                        <td>{{ weatherData.__feels_like && weatherData.__feels_like['night'] }}℃</td>
+                        <td>Feels like</td>
+                        <td>{{ weatherData.__temp && weatherData.__temp['night'] }}℃</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

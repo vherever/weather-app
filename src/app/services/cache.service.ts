@@ -3,9 +3,12 @@ import { Observable } from 'rxjs';
 import hash from 'hash-it';
 import * as dayjs from 'dayjs';
 
+/**
+ * This service will cache the same request all over time until application reloads
+ */
 @Injectable({ providedIn: 'root' })
 export class CacheService<T> {
-  private readonly CACHE_DURATION_IN_MINUTES = 1440; // 24 hours
+  private readonly CACHE_DURATION_IN_MINUTES = 10;
   private readonly DEFAULT_KEY = 'DEFAULT';
 
   private cache: {

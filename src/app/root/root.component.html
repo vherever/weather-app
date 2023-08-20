@@ -3,93 +3,44 @@
         <app-search-box (selectedCityEventEmitter)="onSelectedCityEventEmit($event)"></app-search-box>
 
         <div class="weather_container__left__location_container" *ngIf="locationData$ | async as locationData">
-            <div class="weather_container__left__location_container__city">{{ locationData?.city }}</div>,
+            <div class="weather_container__left__location_container__city ta-center w-100">
+                <span>{{ locationData?.city }}</span>,
+                <span>{{ locationData?.country }}</span>
+            </div>
             <div class="weather_container__left__location_container__country">{{ locationData?.country_name }}</div>
         </div>
 
-<!--        <div class="weather_container__status_icon_container">-->
-<!--            weather icon-->
-<!--        </div>-->
+        <div class="weather_container__temperature">
+            <span class="weather_container__temperature__value">{{ weatherData.current.__temp }}</span>
+            <span class="weather_container__temperature__operator">℃</span>
+        </div>
 
-        <div class="weather_container__temperature">{{ weatherData.current.__temp }} ℃</div>
-
-        <div class="weather_container__today_time">{{ dateFormatted$ | async }}</div>
+        <div class="weather_container__today_time ta-center">{{ dateFormatted$ | async }}</div>
 
         <div class="weather_container__description_container">
             <ng-container *ngFor="let item of weatherData.current.weather">
-                {{ item.description }}
+                <div>{{ item.description }}</div>
 
                 <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="44">
             </ng-container>
         </div>
 
-        <ng-container *ngIf="cityImageUrl$ | async as cityImageUrl">
-            <em>cityImageUrl: {{ cityImageUrl | json }}</em>
-            <img src="" alt="" />
-        </ng-container>
-
 <!--        <div class="weather_container__city_highlight_container">city image</div>-->
     </div>
     <div class="weather_container__right">
-        <div>
-            <h3>Today's Highlights</h3>
-
-
-            <div class="weather_container__right__palette">
-                <div class="application-card">
-                    <div class="application-card__header">UV Index</div>
-                    <div class="application-card__color_range">
-                        <div class="application-card__color_range__from"></div>
-                        <div class="application-card__color_range__current"
-                             [ngStyle]="{'left': 'calc(' +weatherData.current.__uvi_percentage + '% - 4px)'}">{{ weatherData.current.uvi }}</div>
-                        <div class="application-card__color_range__to"></div>
-                    </div>
-                    <br>
-                    <div class="ta-center">{{ weatherData.current.__uvi_status }}</div>
+        <div class="weather_container__right__inner">
+            <div style="display: flex">
+                <div style="width: 50%; padding-right: 10px">
+                    <app-current-weather [currentWeatherData]="weatherData.current" [title]="'Current Highlights'"></app-current-weather>
                 </div>
 
-                <div class="application-card wind-container">
-                    <div class="application-card__header">Wind</div>
-                    <div class="wind-container__value_container">
-                        <div class="wind-container__value_container__value">{{ weatherData.current.wind_speed }}</div>
-                        <span class="wind-container__value_container__operator">m/s</span>
-
-                        <div class="wind-container__value_container__wind">{{ weatherData.current.__wind_direction }}</div>
-                    </div>
-                </div>
-
-                <div class="application-card">
-                    <div class="application-card__header">Sunrise & Sunset</div>
-                    <div>
-                        <img src="../../assets/images/sunrise.svg" alt="Sunrise" width="32">
-                        {{ weatherData.current.__sunrise }}
-                    </div>
-                    <div>
-                        <img src="../../assets/images/sunset.svg" alt="Sunset" width="32">
-                        {{ weatherData.current.__sunset }}
-                    </div>
-                </div>
-
-                <div class="application-card">
-                    <div class="application-card__header">Clouds</div>
-                    <div>{{ weatherData.current.clouds }}%</div>
-                </div>
-
-                <div class="application-card">
-                    <div class="application-card__header">Humidity</div>
-                    <div>{{ weatherData.current.humidity }}%</div>
-                </div>
-
-                <div class="application-card">
-                    <div class="application-card__header">Pressure</div>
-                    <div>{{ weatherData.current.pressure }} hPa</div>
-                </div>
-
-                <div class="application-card">
-                    <div class="application-card__header">Visibility</div>
-                    <div>{{ weatherData.current.__visibility }}km</div>
+                <div style="width: 50%; padding-left: 10px">
+                    <app-current-weather [currentWeatherData]="weatherData.daily[activeDayNo]" [title]="activeDayName"></app-current-weather>
                 </div>
             </div>
+
+            <br>
+            <app-this-week [weeklyData]="weatherData.daily" (activeItemEventEmitter)="onActiveItemEventEmit($event)"></app-this-week>
         </div>
     </div>
 </div>

@@ -7,6 +7,7 @@ import { CitiesApiService } from '../services/cities-api.service';
 @Component({
   selector: 'app-search-box',
   templateUrl: './search-box.component.html',
+  styleUrls: ['./search-box.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchBoxComponent implements OnInit {

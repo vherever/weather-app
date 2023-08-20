@@ -1,0 +1,19 @@
+<h3>This Week</h3>
+
+<div class="cards-container">
+    <ng-container *ngFor="let item of weeklyData; let i = index">
+        <div class="application-card" (click)="onItemCLick(item, i)" [ngClass]="{'__isActive' : item.__isActive}">
+            <div *ngIf="i !== 0" class="ta-center">{{ item.__day }}</div>
+            <div *ngIf="i === 0" class="ta-center">Today</div>
+
+            <div *ngFor="let weather of item.weather" class="ta-center" [title]="weather.description">
+                <img src="{{ weatherIconRepositoryUrl + weather.icon + '@2x.png' }}" alt="Current Weather" width="44">
+            </div>
+
+            <div>
+                <span>{{ item.__temp?.min }}</span> -
+                <span>{{ item.__temp?.max }}</span> ℃
+            </div>
+        </div>
+    </ng-container>
+</div>

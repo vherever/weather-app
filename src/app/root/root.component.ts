@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { BehaviorSubject, map, Observable, shareReplay, switchMap, tap, timer } from 'rxjs';
+import { map, shareReplay, switchMap, tap, timer } from 'rxjs';
+import { weatherIconRepositoryUrl } from '../app-constants';
 import { CityModelByGeoNameId } from '../models/city.model';
-import { WeatherModel } from '../models/weather.model';
-import { CitiesApiService } from '../services/cities-api.service';
+import { DailyWeatherModel, WeatherModel } from '../models/weather.model';
 import { GeoService } from '../services/geo.service';
 import { WeatherApiService } from '../services/weather-api.service';
 import * as dayjs from 'dayjs';
@@ -14,12 +14,19 @@ function getCardinalDirection(angle: number): string {
   return directions[Math.round(angle / 45) % 8];
 }
 
-// TODO: check if ts in milliseconds
-function getTimeHhMmFromTimestamp(ts: number): string {
+/**
+ * @param ts in seconds
+ * @param showSeconds
+ */
+function getTimeHhMmFromTimestamp(ts?: number, showSeconds?: boolean): string {
   const leadingZero = (num: number) => `0${num}`.slice(-2);
-  const dateObj = dayjs(ts * 1000);
+  const dateObj = ts ? dayjs(ts * 1000) : dayjs();
+  const timeValuesArr = [dateObj.hour(), dateObj.minute()];
+  if (showSeconds) {
+    timeValuesArr.push(dateObj.second());
+  }
 
-  return [dateObj.hour(), dateObj.minute()]
+  return timeValuesArr
     .map(leadingZero)
     .join(':');
 }
@@ -52,12 +59,30 @@ function getUvIndexStatus(value: number): string {
 
 function getDateFormatted(): string {
   const dateObj = dayjs();
-  return `${months[dateObj.month()]}, ${dateObj.hour()}:${dateObj.minute()}:${dateObj.second()}`;
+  return `${months[dateObj.month()]} ${dateObj.date()}, ${getTimeHhMmFromTimestamp(undefined, true)}`;
 }
 
 function getUvIndexPercentage(value: number): number {
   const MAXIMUM_VALUE = 15;
   return value > 15 ? 100 : Number((value / MAXIMUM_VALUE * 100).toFixed(0));
+}
+
+function numberToFixedZero(value: number): number {
+  return Number(value.toFixed(0));
+}
+
+function timestampToDay(value: number): string {
+  const daysInWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const date = new Date(value * 1000);
+  const dateObj = dayjs(date);
+  return daysInWeek[dateObj.day()];
+}
+
+function timestampToDayFull(value: number): string {
+  const daysInWeekFull = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const date = new Date(value * 1000);
+  const dateObj = dayjs(date);
+  return daysInWeekFull[dateObj.day()];
 }
 
 @Component({
@@ -66,15 +91,12 @@ function getUvIndexPercentage(value: number): number {
   changeDetection: ChangeDetectionStrategy.Default
 })
 export class RootComponent {
-  public readonly weatherIconRepositoryUrl = 'https://openweathermap.org/img/wn/';
+  public readonly weatherIconRepositoryUrl = weatherIconRepositoryUrl;
 
-  public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1)).pipe(
-    tap((data) => {
-      console.log('lll', data);
-    })
-  );
+  public activeDayNo = 0; // today
+  public activeDayName = `Today's Highlights`;
 
-  public cityImageUrl$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1));
 
   public weatherData$ = this.locationData$.pipe(
     switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] })),
@@ -82,8 +104,8 @@ export class RootComponent {
       ...res,
       ...this.transformWeatherData(res)
     })),
-    tap((res) => {
-      console.log('R', res);
+    tap((data) => {
+      data.daily[this.activeDayNo].__isActive = true;
     })
   );
 
@@ -93,9 +115,13 @@ export class RootComponent {
 
   constructor(
     private geoService: GeoService,
-    private weatherService: WeatherApiService,
-    private citiesApiService: CitiesApiService
+    private weatherService: WeatherApiService
   ) {}
+
+  public onActiveItemEventEmit(data: { item: DailyWeatherModel; index: number }): void {
+    this.activeDayNo = data.index;
+    this.activeDayName =  data.index === 0 ? `Today's Highlights` : `${data.item.__day_full}'s Highlights`;
+  }
 
   public onSelectedCityEventEmit(value: CityModelByGeoNameId): void {
     console.log('v', `${value._links['city:urban_area']?.href}images`); // photos[0].image.mobile
@@ -126,12 +152,11 @@ export class RootComponent {
         ...this.transformWeatherData(res)
       }))
     );
-
-    // this.cityImageUrl$.next(`${value._links['city:urban_area']?.href}images`);
   }
 
-  private transformWeatherData(res: WeatherModel): any {
+  private transformWeatherData(res: WeatherModel): WeatherModel {
     return {
+      ...res,
       current: {
         ...res.current,
         __wind_direction: getCardinalDirection(res.current.wind_deg),
@@ -150,13 +175,21 @@ export class RootComponent {
         __uvi_status: getUvIndexStatus(o.uvi),
         __uvi_percentage: getUvIndexPercentage(o.uvi),
         __temp: {
-          day: o.temp.day.toFixed(0),
-          eve: o.temp.eve.toFixed(0),
-          max: o.temp.max.toFixed(0),
-          min: o.temp.min.toFixed(0),
-          morn: o.temp.morn.toFixed(0),
-          night: o.temp.night.toFixed(0),
-        }
+          day: numberToFixedZero(o.temp.day),
+          eve: numberToFixedZero(o.temp.eve),
+          max: numberToFixedZero(o.temp.max),
+          min: numberToFixedZero(o.temp.min),
+          morn: numberToFixedZero(o.temp.morn),
+          night: numberToFixedZero(o.temp.night)
+        },
+        __feels_like: {
+          day: numberToFixedZero(o.feels_like.day),
+          eve: numberToFixedZero(o.feels_like.eve),
+          morn: numberToFixedZero(o.feels_like.morn),
+          night: numberToFixedZero(o.feels_like.night),
+        },
+        __day: timestampToDay(o.dt),
+        __day_full: timestampToDayFull(o.dt)
       }))
     }
   }

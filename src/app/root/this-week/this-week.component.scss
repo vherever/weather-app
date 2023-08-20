@@ -1,0 +1,19 @@
+.cards-container {
+  padding: 5px;
+  width: 100%;
+  display: flex;
+  place-content: center space-between;
+  align-items: center;
+  padding-top: 10px;
+  cursor: pointer;
+}
+
+.__isActive {
+  background-color: #e5e5e7;
+}
+
+h3 {
+  margin-bottom: 3px;
+  text-decoration: underline;
+  padding-left: 7px;
+}

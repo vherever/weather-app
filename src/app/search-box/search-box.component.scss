@@ -1,0 +1,10 @@
+::ng-deep {
+  mat-option {
+    min-height: 30px !important;
+    padding: 5px 10px !important;
+  }
+  .mat-mdc-option .mdc-list-item__primary-text {
+    font-size: 12px !important;
+    line-height: 12px !important;
+  }
+}
