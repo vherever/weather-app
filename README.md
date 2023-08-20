@@ -1,4 +1,9 @@
 # WeatherApp
+
+![demo](https://github.com/vherever/weather-app/blob/master/![application-demo-1.png](application-demo-1.png))
+
+![demo](https://github.com/vherever/weather-app/blob/master/![application-demo-2.png](application-demo-2.png))
+
 - uses geo.geosurf.io to get user ip details, no API key required
 - uses api.openweathermap.org to get weather details, API key is mandatory
 - uses api.teleport.org to search city, no API key required
