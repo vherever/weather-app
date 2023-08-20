@@ -21,7 +21,7 @@
             <ng-container *ngFor="let item of weatherData.current.weather">
                 <div>{{ item.description }}</div>
 
-                <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="44">
+                <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="32">
             </ng-container>
         </div>
 

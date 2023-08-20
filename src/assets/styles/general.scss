@@ -2,11 +2,16 @@
 Custom general components styling
  */
 
+* {
+  box-sizing: border-box;
+}
+
 .application-card {
   position: relative;
   padding: 12px 12px;
   background-color: #ffffff;
   border-radius: 12px;
+  border: 1px solid #e4e4e4;
   &__header {
     margin-bottom: 1em;
     font-size: 13px;
