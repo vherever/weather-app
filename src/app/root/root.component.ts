@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { map, shareReplay, switchMap, tap, timer } from 'rxjs';
 import { weatherIconRepositoryUrl } from '../app-constants';
 import { CityModelByGeoNameId } from '../models/city.model';
@@ -101,19 +100,15 @@ export class RootComponent {
 
   public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1));
 
-  private queryParams$ = this.route.queryParams;
-
-  public weatherData$ = this.queryParams$.pipe(
-    switchMap((queryParams) => this.locationData$.pipe(
-      switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] }, queryParams['apikey'])),
-      map((res) => ({
-        ...res,
-        ...this.transformWeatherData(res)
-      })),
-      tap((data) => {
-        data.daily[this.activeDayNo].__isActive = true;
-      })
-    ))
+  public weatherData$ = this.locationData$.pipe(
+    switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] })),
+    map((res) => ({
+      ...res,
+      ...this.transformWeatherData(res)
+    })),
+    tap((data) => {
+      data.daily[this.activeDayNo].__isActive = true;
+    })
   );
 
   public dateFormatted$ = timer(0, 1000).pipe(
@@ -122,8 +117,7 @@ export class RootComponent {
 
   constructor(
     private geoService: GeoService,
-    private weatherService: WeatherApiService,
-    private route: ActivatedRoute
+    private weatherService: WeatherApiService
   ) {}
 
   public onActiveItemEventEmit(data: { item: DailyWeatherModel; index: number }): void {
@@ -141,8 +135,7 @@ export class RootComponent {
       }))
     )
     const latLon = value.location.latlon;
-    this.weatherData$ = this.queryParams$.pipe(
-      switchMap((queryParams) => this.weatherService.getWeatherByLonAndLat({ lon: latLon.longitude, lat: latLon.latitude }, queryParams['apikey'])),
+    this.weatherData$ = this.weatherService.getWeatherByLonAndLat({ lon: latLon.longitude, lat: latLon.latitude }).pipe(
       map((res) => ({
         ...res,
         ...this.transformWeatherData(res)
