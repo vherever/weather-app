@@ -16,6 +16,7 @@ Installation
 2. npm run start
 3. Open the project locally and provide the OpenWeatherMap API key. The link should have apikey query parameter: http://localhost:4200/?apikey=YOUR_API_KEY
 
+
 TODO:
 - show previously loaded (cached) cities in dropdown
 - show city image if exist (teleport API)
