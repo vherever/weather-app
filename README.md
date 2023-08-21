@@ -8,6 +8,7 @@
 
 - uses geo.geosurf.io to get user ip details, no API key required
 - uses api.openweathermap.org to get weather details, API key is mandatory
+- uses OpenLayers maps API to show user's location on a map, no API key required
 - uses api.teleport.org to search city, no API key required
 
 Installation

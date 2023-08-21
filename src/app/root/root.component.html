@@ -13,6 +13,7 @@
             <div class="weather_container__left__location_container__country">{{ locationData?.country_name }}</div>
         </div>
 
+
         <div class="weather_container__temperature">
             <span class="weather_container__temperature__value">{{ weatherData.current.__temp }}</span>
             <span class="weather_container__temperature__operator">℃</span>
@@ -21,15 +22,16 @@
         <div class="weather_container__today_time ta-center">{{ dateFormatted$ | async }}</div>
 
         <div class="weather_container__description_container">
-            <ng-container *ngFor="let item of weatherData.current.weather">
+            <div *ngFor="let item of weatherData.current.weather" class="ta-center" style="margin: 0 auto">
                 <div style="text-transform: capitalize;">{{ item.description }}</div>
-
-                <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="32">
-            </ng-container>
+                <img src="{{ weatherIconRepositoryUrl + item.icon + '@2x.png' }}" alt="Current Weather" width="44">
+            </div>
         </div>
     </div>
     <div class="weather_container__right">
         <div class="weather_container__right__inner">
+            <app-map [latLon]="{ lat: weatherData.lat, lon: weatherData.lon }"></app-map>
+
             <div style="display: flex">
                 <div style="width: 50%; padding-right: 10px">
                     <app-current-weather [currentWeatherData]="weatherData.current" [title]="'Current Highlights'"></app-current-weather>

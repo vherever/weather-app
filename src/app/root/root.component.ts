@@ -10,6 +10,8 @@ import * as dayjs from 'dayjs';
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+
+// TODO: Let's move pure functions somewhere else
 function getCardinalDirection(angle: number): string {
   const directions = ['↑ N', '↗ NE', '→ E', '↘ SE', '↓ S', '↙ SW', '← W', '↖ NW'];
   return directions[Math.round(angle / 45) % 8];
@@ -99,7 +101,9 @@ export class RootComponent {
 
   public locationData$ = this.geoService.getUserLocationDetails().pipe(shareReplay(1));
 
-  public weatherData$ = this.route.queryParams.pipe(
+  private queryParams$ = this.route.queryParams;
+
+  public weatherData$ = this.queryParams$.pipe(
     switchMap((queryParams) => this.locationData$.pipe(
       switchMap((data) => this.weatherService.getWeatherByLonAndLat({ lon: data.loc[0], lat: data.loc[1] }, queryParams['apikey'])),
       map((res) => ({
@@ -137,7 +141,7 @@ export class RootComponent {
       }))
     )
     const latLon = value.location.latlon;
-    this.weatherData$ = this.route.queryParams.pipe(
+    this.weatherData$ = this.queryParams$.pipe(
       switchMap((queryParams) => this.weatherService.getWeatherByLonAndLat({ lon: latLon.longitude, lat: latLon.latitude }, queryParams['apikey'])),
       map((res) => ({
         ...res,
@@ -149,6 +153,7 @@ export class RootComponent {
     );
   }
 
+  // TODO: we can create an instance of a class WeatherModel, and make data preparation in that instance
   private transformWeatherData(res: WeatherModel): WeatherModel {
     return {
       ...res,

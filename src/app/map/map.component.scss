@@ -1,0 +1,10 @@
+#map {
+  height: 100px;
+  width: 100%
+}
+
+::ng-deep {
+  .ol-rotate, .ol-attribution {
+    display: none !important;
+  }
+}

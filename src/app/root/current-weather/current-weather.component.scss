@@ -78,6 +78,12 @@
   display: flex;
   place-content: flex-start space-between;
   align-items: flex-start;
+
+  .temperature-details-container {
+    width: 100%;
+    font-size: 12px;
+    line-height: 12px;
+  }
 }
 
 h3 {
