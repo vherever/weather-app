@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { debounceTime, filter, map, Observable, startWith, switchMap } from 'rxjs';
-import { CityModelByGeoNameId, CitySearchResult } from '../models/city.model';
-import { CitiesApiService } from '../services/cities-api.service';
+import { CityModelByGeoNameId, CitySearchResult } from '../../models/city.model';
+import { CitiesApiService } from '../../services/cities-api.service';
 
 @Component({
   selector: 'app-search-box',
